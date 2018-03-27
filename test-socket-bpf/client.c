@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in server_addr;
 	bzero(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	inet_aton("172.17.0.3", &server_addr.sin_addr);
+	inet_aton("172.17.0.4", &server_addr.sin_addr);
 	server_addr.sin_port = htons(12345);
 	if(connect(client_socket, (struct sockaddr*)(&server_addr), sizeof(server_addr)) < 0)
 	{
