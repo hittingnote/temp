@@ -1,0 +1,9 @@
+     1	ldh [0]			/* Load TCP src port */
+     2	jeq #8880, pass		/* if src_port==8880, jump to pass */
+     3	ret #0			/* Drop the packet */
+     4	pass: ret #-1		/* Pass the packet */
+     5	
+     6	
+     7	
+     8	
+     9	
