@@ -1,0 +1,19 @@
+     1	#include "bpf_api.h"
+     2	#include <linux/if_ether.h>
+     3	#include <linux/ip.h>
+     4	
+     5	__section("bpf") int bpf_main(struct __sk_buff *skb)
+     6	{
+     7		uint32_t src_ip;
+     8		int nh_off = BPF_LL_OFF + ETH_HLEN;
+     9		int ret = TC_ACT_OK;
+    10	
+    11		src_ip = load_word(skb, nh_off+offsetof(struct iphdr, saddr));
+    12		if(src_ip == ((172 << 24) | (17 << 16) | (0 << 8) | 3))
+    13			ret = TC_ACT_SHOT;
+    14	
+    15		return ret;
+    16	}
+    17	
+    18	char license[] __section("license") = "GPL";
+    19	
