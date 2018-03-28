@@ -17,3 +17,9 @@
     17	
     18	char license[] __section("license") = "GPL";
     19	
+
+
+clang -O2 -Wall -target bpf -c bpf.c -o bpf.o
+tc qdisc add dev veth_server clsact
+tc filter add dev veth_server egress bpf direct-action obj bpf.o section bpf
+
