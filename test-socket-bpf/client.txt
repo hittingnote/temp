@@ -1,59 +1,26 @@
-     1	#include <unistd.h>
-     2	#include <stdio.h>
-     3	#include <string.h>
-     4	#include <sys/socket.h>
-     5	#include <linux/filter.h>
-     6	#include <sys/types.h>
-     7	#include <arpa/inet.h>
-     8	#include <linux/if_ether.h>
-     9	#include <stdlib.h>
+     1	int main(int argc, char *argv[])
+     2	{
+     3		client_addr.sin_port = htons(8880);
+     4	
+     5		/* Create a client TCP socket */
+     6		client_socket = socket(AF_INET, SOCK_STREAM);
+     7	
+     8		/* Bind client_socket with local port */
+     9		bind(client_socket, &client_addr, sizeof(client_addr));
     10	
-    11	
-    12	
-    13	int main(int argc, char *argv[])
-    14	{
-    15		struct sockaddr_in client_addr;
-    16		bzero(&client_addr, sizeof(client_addr));
-    17		client_addr.sin_family = AF_INET;
-    18		client_addr.sin_addr.s_addr = htons(INADDR_ANY);
-    19		client_addr.sin_port = htons(8880);
+    11		/* Connect to remote server */
+    12		inet_aton("172.17.0.4", &server_addr.sin_addr);
+    13		connect(client_socket, &server_addr, sizeof(server_addr));
+    14	
+    15		/* Send messages in sendstr to remote server */
+    16		send(client_socket, sendstr);
+    17	
+    18		/* Receive messages from remote server and copy them to recvstr */
+    19		recv(client_socket, recvstr);
     20	
-    21		/* Create a client TCP socket */
-    22		int client_socket = socket(AF_INET, SOCK_STREAM, 0);
-    23		if(client_socket < 0)
-    24		{
-    25			perror("socket");
-    26			exit(1);
-    27		}
-    28	
-    29		/* Bind client_socket with local port */
-    30		if(bind(client_socket, (struct sockaddr*)(&client_addr), sizeof(client_addr)) < 0)
-    31		{
-    32			perror("bind");
-    33			exit(1);
-    34		}
-    35	
-    36		/* Connect to remote server */
-    37		struct sockaddr_in server_addr;
-    38		bzero(&server_addr, sizeof(server_addr));
-    39		server_addr.sin_family = AF_INET;
-    40		inet_aton("172.17.0.3", &server_addr.sin_addr);
-    41		server_addr.sin_port = htons(12345);
-    42		if(connect(client_socket, (struct sockaddr*)(&server_addr), sizeof(server_addr)) < 0)
-    43		{
-    44			perror("connect");
-    45			exit(1);
-    46		}
-    47	
-    48		/* Send and receive messages */
-    49		char sendstr[] = "I am client.";
-    50		char recvstr[1024];
-    51		send(client_socket, sendstr, strlen(sendstr)+1, 0);
-    52		recv(client_socket, recvstr, 1024, 0);
-    53		printf("%s\n", recvstr);
-    54	
-    55		close(client_socket);
-    56	
-    57		return 0;
-    58	}
-    59	
+    21		/* close client socket */
+    22		close(client_socket);
+    23	
+    24		return 0;
+    25	}
+    26	
